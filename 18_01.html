@@ -1,0 +1,111 @@
+<a href=https://adventofcode.com/2018/day/1>adventofcode.com/2018/day/1</a><br>
+<style> body { background: #EEE; color: #222; } </style><br>
+<input id="radio_custom" onchange="update_source()" type="radio" name="input_source">
+<label for="radio_custom">Custom: </label>
+<textarea rows="1" cols="20" id=input_custom></textarea>
+<br>
+<input id="radio_example" checked onchange="update_source()" type="radio" name="input_source">
+<label for="radio_example">Example:</label><br><pre id=pre_example></pre>
+<hr>
+Sollution part1: <code id="part1_output"></code><br>
+Sollution part2: <code id="part2_output"></code>
+<hr>
+<pre id=notes>
+part1: the resulting frequency is 3
++1
+-2
++3
++1
+
+---
+
+part2:
++1, -1 first reaches 0 twice.
++3, +3, +4, -2, -4 first reaches 10 twice.
+-6, +3, +8, +5, -6 first reaches 5 twice.
++7, +7, -2, -7, -4 first reaches 14 twice.
+
++7
++7
+-2
+-7
+-4
+
+<script type="text/javascript">
+
+    example_input=`
+        +7
+        +7
+        -2
+        -7
+        -4
+    `.replace(/\n[^\n]\s+/g,'\n').slice(1,)
+
+    function part1(input_text)
+    {
+        return input_text.trim().split('\n')
+                         .map(x => parseInt(x))
+                         .reduce( (a,b) => a+b)
+    }
+
+    function part2(input_text)
+    {
+        let data = input_text.trim().split('\n').map(x => parseInt(x))
+
+        let freq = new Set()
+        let current_frequency = 0
+        let sum = null
+
+        while (!duplicate_frequency) {
+          for (v of data) {
+            freq.add(current_frequency)
+            current_frequency += v
+            if (freq.has(current_frequency)) {
+              duplicate_frequency = current_frequency
+              break
+            }
+          }
+        }
+
+        return duplicate_frequency
+    }
+
+
+
+
+    function get_stars(input_text)
+    {
+        document.getElementById('part1_output').textContent = part1(input_text)
+        document.getElementById('part2_output').textContent = part2(input_text)
+    }
+
+    document.getElementById('pre_example').textContent = example_input
+
+    const custom_input = document.getElementById('input_custom')
+    const custom_radio = document.getElementById('radio_custom')
+    const example_radio = document.getElementById('radio_example')
+
+    custom_radio.checked = (window.localStorage["CustomInputSelected"] == "true")
+
+    function update_source()
+    {
+        if (custom_radio.checked)
+            get_stars(custom_input.value)
+        else
+            get_stars(example_input)
+
+        window.localStorage["CustomInputSelected"] = custom_radio.checked
+    }
+
+    if (window.localStorage["CustomInputData"])
+        custom_input.value = window.localStorage["CustomInputData"]
+
+    custom_input.addEventListener("keyup", function() {
+        window.localStorage["CustomInputData"] = custom_input.value
+
+        if (custom_radio.checked)
+            get_stars(custom_input.value)
+    })
+
+    update_source()
+</script>
