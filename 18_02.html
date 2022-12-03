@@ -1,0 +1,176 @@
+<a href=https://adventofcode.com/2018/day/2>adventofcode.com/2018/day/2</a><br>
+<style> body { background: #EEE; color: #222; } </style><br>
+<input id="radio_custom" onchange="update_source()" type="radio" name="input_source">
+<label for="radio_custom">Custom: </label>
+<textarea rows="1" cols="20" id=input_custom></textarea>
+<br>
+<input id="radio_example" checked onchange="update_source()" type="radio" name="input_source">
+<label for="radio_example">Example:</label><br><pre id=pre_example></pre>
+<hr>
+Sollution part1: <code id="part1_output"></code><br>
+Sollution part2: <code id="part2_output"></code>
+<hr>
+<pre id=notes>
+    part 2:
+
+    abcde
+    fghij
+    klmno
+    pqrst
+    fguij
+    axcye
+    wvxyz
+
+    The IDs abcde and axcye are close, but they
+    differ by two characters (the second and
+    fourth). However, the IDs fghij and fguij
+    differ by exactly one character, the third
+    (h and u). Those must be the correct boxes.
+
+    What letters are common between the two
+    correct box IDs? (In the example above, this
+    is found by removing the differing character
+    from either ID, producing fgij.)
+    ===
+    find number of lines with char that appears exactly twice
+    multiply by number of lines with char that appears exactly thrice
+
+    abcdef contains no letters that appear exactly two or three times.
+    bababc contains two a and three b, so it counts for both.
+    abbcde contains two b, but no letter appears exactly three times.
+    abcccd contains three c, but no letter appears exactly two times.
+    aabcdd contains two a and two d, but it only counts once.
+    abcdee contains two e.
+    ababab contains three a and three b, but it only counts once.
+
+    Of these box IDs, four of them contain a
+    letter which appears exactly twice, and three
+    of them contain a letter which appears
+    exactly three times. Multiplying these
+    together produces a checksum of 4 * 3 = 12.
+
+
+    ====
+
+<script type="text/javascript">
+
+    example_input=`
+        abcde
+        fghij
+        klmno
+        pqrst
+        fguij
+        axcye
+        wvxyz
+    `.replace(/\n[^\n]\s+/g,'\n').slice(1,)
+
+    function part1(input_text)
+    {
+        input_array = input_text.trim().split('\n').map(x => x.split('').sort())
+
+        let twice = 0
+        let thrice = 0
+
+        for (line of input_array) {
+
+            let last_char = ""
+            let counter = 0
+            let line_has_twice = 0
+            let line_has_thrice = 0
+
+            for (char of line) {
+                if (char != last_char) {
+                    last_char = char
+                    if (counter == 2 && line_has_twice == 0)
+                        line_has_twice = 1
+                    else if (counter == 3 && line_has_thrice == 0)
+                        line_has_thrice = 1
+
+                    counter = 1
+                } else
+                    counter++
+            }
+
+            if (counter == 2 && line_has_twice == 0)
+                line_has_twice = 1
+            else if (counter == 3 && line_has_thrice == 0)
+                line_has_thrice = 1
+
+            thrice += line_has_thrice
+            twice += line_has_twice
+        }
+        
+        return twice * thrice
+    }
+
+    function part2(input_text)
+    {
+        let input_array = input_text.trim().split('\n').map(x => x.split('')).sort()
+        let sollution = ""
+
+        for (line_nr in input_array.slice(0,-1)) {
+            let indx = parseInt(line_nr) + 1
+            
+            let ref_line = input_array[line_nr]
+            for (let line of input_array.slice(indx,)) {
+                let bork = 0
+                for (char in line) {
+                    if (line[char] != ref_line[char]) {
+                        if (++bork > 1)
+                            continue
+                    }
+                }
+                
+                if (bork == 1) {
+                    for (char in line) {
+                        if (line[char] == ref_line[char])
+                            sollution += line[char]
+                    }
+                    
+                    break
+                }
+            }
+        }
+
+        return sollution
+    }
+
+
+
+
+    function get_stars(input_text)
+    {
+        document.getElementById('part1_output').textContent = part1(input_text)
+        document.getElementById('part2_output').textContent = part2(input_text)
+    }
+
+    document.getElementById('pre_example').textContent = example_input
+
+    const custom_input = document.getElementById('input_custom')
+    const custom_radio = document.getElementById('radio_custom')
+    const example_radio = document.getElementById('radio_example')
+
+    custom_radio.checked = (window.localStorage["CustomInputSelected"] == "true")
+
+    function update_source()
+    {
+        if (custom_radio.checked)
+            get_stars(custom_input.value)
+        else
+            get_stars(example_input)
+
+        window.localStorage["CustomInputSelected"] = custom_radio.checked
+    }
+
+    if (window.localStorage["CustomInputData"])
+        custom_input.value = window.localStorage["CustomInputData"]
+
+    custom_input.addEventListener("keyup", function() {
+        window.localStorage["CustomInputData"] = custom_input.value
+
+        if (custom_radio.checked)
+            get_stars(custom_input.value)
+    })
+
+    update_source()
+</script>
