@@ -1,0 +1,131 @@
+<a href=https://adventofcode.com/2022/day/3>adventofcode.com/2022/day/3</a><br>
+<style> body { background: #EEE; color: #222; } </style><br>
+<input id="radio_custom" onchange="update_source()" type="radio" name="input_source">
+<label for="radio_custom">Custom: </label>
+<textarea rows="1" cols="20" id=input_custom></textarea>
+<br>
+<input id="radio_example" checked onchange="update_source()" type="radio" name="input_source">
+<label for="radio_example">Example:</label><br><pre id=pre_example></pre>
+<hr>
+Sollution part1: <code id="part1_output"></code><br>
+Sollution part2: <code id="part2_output"></code>
+<hr>
+<pre id=notes>
+part1: split lines in two, find the char that exist in both parts
+p, L, P, v, t, s -> 157
+
+part2: group lines by 3, find char that appears in all groups
+r, Z -> 70
+
+TODO: there must be something smarter then abc "dict"
+
+<script type="text/javascript">
+
+    example_input=`
+        vJrwpWtwJgWrhcsFMMfFFhFp
+        jqHRNqRjqzjGDLGLrsFMfFZSrLrFZsSL
+        PmmdzqPrVvPwwTWBwg
+        wMqvLMZHhHMvwLHjbvcjnnSBnvTQFn
+        ttgJtRGJQctTZtZT
+        CrZsJsPPZsGzwwsLwLmpwMDw
+    `.replace(/\n[^\n]\s+/g,'\n').slice(1,)
+
+    abc = 
+    {
+        "a":1, "b":2, "c":3, "d":4, "e":5, "f":6, "g":7, "h":8, "i":9, "j":10, "k":11, "l":12, "m":13, "n":14, "o":15, "p":16, "q":17, "r":18, "s":19, "t":20, "u":21, "v":22, "w":23, "x":24, "y":25, "z":26,
+        "A":27, "B":28, "C":29, "D":30, "E":31, "F":32, "G":33, "H":34, "I":35, "J":36, "K":37, "L":38, "M":39, "N":40, "O":41, "P":42, "Q":43, "R":44, "S":45, "T":46, "U":47, "V":48, "W":49, "X":50, "Y":51, "Z":52
+    }
+
+    function part1(input_text)
+    {
+        input_array = input_text.trim().split('\n')
+
+        let answer = 0
+
+        for (line of input_array)
+        {
+
+            let l = line.length
+            let fack1 = line.slice(0,l/2).split('')
+            let fack2 = line.slice(l/2).split('')
+
+            let sFack2 = new Set(fack2)
+
+            for (c1 of fack1)
+            {
+                if (sFack2.has(c1))
+                {
+                    answer += abc[c1]
+                    break
+                }
+            }
+        }
+        
+        return answer
+    }
+
+    function part2(input_text)
+    {
+        let input_array = input_text.trim().split('\n')
+        let answer = 0
+
+        for (let i = 0; i < input_array.length ; i+=3) {
+
+            let sack1 = input_array[i].split('').sort()
+            let sack2 = input_array[i+1].split('').sort()
+            let sack3 = input_array[i+2].split('').sort()
+
+            let sSack2 = new Set(sack2)
+            let sSack3 = new Set(sack3)
+
+            for (c1 of sack1) {
+                if (sSack2.has(c1) && sSack3.has(c1))
+                {
+                    answer += abc[c1]
+                    break
+                }
+            }
+        }
+
+        return answer
+    }
+
+
+
+
+    function get_stars(input_text)
+    {
+        document.getElementById('part1_output').textContent = part1(input_text)
+        document.getElementById('part2_output').textContent = part2(input_text)
+    }
+
+    document.getElementById('pre_example').textContent = example_input
+
+    const custom_input = document.getElementById('input_custom')
+    const custom_radio = document.getElementById('radio_custom')
+    const example_radio = document.getElementById('radio_example')
+
+    custom_radio.checked = (window.localStorage["CustomInputSelected"] == "true")
+
+    function update_source()
+    {
+        if (custom_radio.checked)
+            get_stars(custom_input.value)
+        else
+            get_stars(example_input)
+
+        window.localStorage["CustomInputSelected"] = custom_radio.checked
+    }
+
+    if (window.localStorage["CustomInputData"])
+        custom_input.value = window.localStorage["CustomInputData"]
+
+    custom_input.addEventListener("keyup", function() {
+        window.localStorage["CustomInputData"] = custom_input.value
+
+        if (custom_radio.checked)
+            get_stars(custom_input.value)
+    })
+
+    update_source()
+</script>

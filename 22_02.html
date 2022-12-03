@@ -1,0 +1,142 @@
+<a href=https://adventofcode.com/2022/day/2>adventofcode.com/2022/day/2</a><br>
+<style> body { background: #EEE; color: #222; } </style><br>
+<input id="radio_custom" onchange="update_source()" type="radio" name="input_source">
+<label for="radio_custom">Custom: </label>
+<textarea rows="1" cols="20" id=input_custom></textarea>
+<br>
+<input id="radio_example" checked onchange="update_source()" type="radio" name="input_source">
+<label for="radio_example">Example:</label><br><pre id=pre_example></pre>
+<hr>
+Sollution part1: <code id="part1_output"></code><br>
+Sollution part2: <code id="part2_output"></code>
+<hr>
+<pre id=notes>
+example part1: (8 + 1 + 6)
+example part2: 12
+RPC != SSP (sten1 sax3 påse2 -> sten1 påse2 sax3)
+win = 6 , draw = 3, lose = 0
+X = lose, Y = draw, Z = win <- part2
+
+<script type="text/javascript">
+
+    example_input=`
+        A Y
+        B X
+        C Z
+    `.replace(/\n[^\n]\s+/g,'\n').slice(1,)
+
+    function part1(input_text)
+    {
+        input_array = input_text.trim().split('\n')
+
+        let op = {"A":"Y", "B":"Z", "C":"X"}
+        let me = {"X":"A", "Y":"B", "Z":"C"}
+
+        let point = 0
+        let game = 0
+
+        for (line of input_array) {
+            match = line.split(' ')
+
+            choice_op = match[0]
+            choice_me = match[1]
+
+            if (choice_op == me[choice_me])
+                point = 3
+            else if (choice_me == op[choice_op])
+                point = 6
+            else
+                point = 0
+
+            if (choice_me == "X")
+                point += 1
+            else if (choice_me == "Y")
+                point += 2
+            else
+                point += 3
+
+            game += point
+        }
+
+        return game
+    }
+
+    function part2(input_text)
+    {
+        input_array = input_text.trim().split('\n')
+        let op = {"A":1, "B":2, "C":3}
+        let me = {"X":0, "Y":3, "Z":6} // lose, draw, win
+
+        let sign_point = 0
+        let match_point = 0
+
+        let game = 0
+        let last_line = ""
+
+        // by sorting the array we can use the same
+        // score for repeating lines
+        for (line of input_array.sort()) {
+
+            if (line != last_line)
+            {
+                last_line = line
+                let match = line.split(' ')
+
+                match_point = me[match[1]]
+
+                if (match_point == 0)
+                    sign_point = ((op[match[0]] + 1) % 3) + 1
+                else if (match_point == 6)
+                    sign_point = (op[match[0]] % 3) + 1
+                else
+                    sign_point = op[match[0]]
+
+                match_point += sign_point
+            }
+            
+            game += match_point
+        }
+
+        return game
+        
+    }
+
+
+
+
+    function get_stars(input_text)
+    {
+        document.getElementById('part1_output').textContent = part1(input_text)
+        document.getElementById('part2_output').textContent = part2(input_text)
+    }
+
+    document.getElementById('pre_example').textContent = example_input
+
+    const custom_input = document.getElementById('input_custom')
+    const custom_radio = document.getElementById('radio_custom')
+    const example_radio = document.getElementById('radio_example')
+
+    custom_radio.checked = (window.localStorage["CustomInputSelected"] == "true")
+
+    function update_source()
+    {
+        if (custom_radio.checked)
+            get_stars(custom_input.value)
+        else
+            get_stars(example_input)
+
+        window.localStorage["CustomInputSelected"] = custom_radio.checked
+    }
+
+    if (window.localStorage["CustomInputData"])
+        custom_input.value = window.localStorage["CustomInputData"]
+
+    custom_input.addEventListener("keyup", function() {
+        window.localStorage["CustomInputData"] = custom_input.value
+
+        if (custom_radio.checked)
+            get_stars(custom_input.value)
+    })
+
+    update_source()
+</script>
