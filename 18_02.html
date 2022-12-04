@@ -109,23 +109,21 @@ Sollution part2: <code id="part2_output"></code>
         let sollution = ""
 
         for (line_nr in input_array.slice(0,-1)) {
+
             let indx = parseInt(line_nr) + 1
-            
             let ref_line = input_array[line_nr]
+            
             for (let line of input_array.slice(indx,)) {
+
                 let bork = 0
-                for (char in line) {
-                    if (line[char] != ref_line[char]) {
-                        if (++bork > 1)
-                            continue
-                    }
-                }
+                for (char in line)
+                    if (line[char] != ref_line[char] && ++bork > 1)
+                        continue
                 
                 if (bork == 1) {
-                    for (char in line) {
+                    for (char in line)
                         if (line[char] == ref_line[char])
                             sollution += line[char]
-                    }
                     
                     break
                 }

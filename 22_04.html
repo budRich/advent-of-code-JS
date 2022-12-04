@@ -1,0 +1,158 @@
+<a href=https://adventofcode.com/2022/day/4>adventofcode.com/2022/day/4</a><br>
+<style> body { background: #EEE; color: #222; } #stuff { width: 100%; } </style><br>
+<input id="radio_custom" onchange="update_source()" type="radio" name="input_source">
+<label for="radio_custom">Custom: </label>
+<textarea rows="1" cols="20" id=input_custom></textarea>
+<br>
+<input id="radio_example" checked onchange="update_source()" type="radio" name="input_source">
+<label for="radio_example">Example:</label><br><pre id=pre_example></pre>
+<hr>
+Sollution part1: <code id="part1_output"></code><br>
+Sollution part2: <code id="part2_output"></code>
+<hr>
+<pre id=notes>
+Part1: how many pairs fully contain one of the other (2)
+
+Within the first pair of Elves, the first Elf
+was assigned sections 2-4 (sections 2, 3, and
+4), while the second Elf was assigned
+sections 6-8 (sections 6, 7, 8).
+
+The Elves in the second pair were each
+assigned two sections.
+
+The Elves in the third pair were each assigned
+three sections: one got sections 5, 6, and 7,
+while the other also got 7, plus 8 and 9.
+
+
+.234.....  2-4
+.....678.  6-8
+
+.23......  2-3
+...45....  4-5
+
+....567..  5-7
+......789  7-9
+
+.2345678.  2-8 <- 
+..34567..  3-7
+
+.....6...  6-6 <-
+...456...  4-6
+
+.23456...  2-6
+...45678.  4-8
+
+part2, wrongs 935, 936
+</pre>
+<div id=stuff>
+    <svg height="20000" width="100%" id="bars">
+    </svg>
+</div>
+
+<script type="text/javascript">
+
+    example_input=`
+        2-4,6-8
+        2-3,4-5
+        5-7,7-9
+        2-8,3-7
+        6-6,4-6
+        2-6,4-8
+    `.replace(/\n[^\n]\s+/g,'\n').slice(1,)
+
+    function part1(input_text)
+    {
+        let input_array = input_text.trim().split('\n')
+        let sollution = 0
+
+        for (line of input_array) {
+            // sr section_ranges
+            let sr = line.split(',').map(x => x.split('-').map(y => parseInt(y)))
+
+            if ( (sr[0][1] >= sr[1][1] && sr[0][0] <= sr[1][0])
+              || (sr[0][1] <= sr[1][1] && sr[0][0] >= sr[1][0]) )
+                sollution++
+        }
+
+        return sollution
+    }
+
+    function part2(input_text)
+    {
+        let input_array = input_text.trim().split('\n')
+        let sollution = 0
+
+        const svg_bars = document.getElementById('bars')
+
+        let bary = 2
+        let bar = ""
+
+        for (line of input_array) {
+            // sr section_ranges
+
+            let sr = line.split(',')
+                         .map( x => 
+                              x.split('-')
+                               .map(y => parseInt(y)) 
+                             )
+                         .sort( (a,b) => a[0] - b[0])
+
+            let color = "red"
+            
+            if ( sr[0][1] >= sr[1][0] ) {
+                sollution++
+                color = "green"
+            }
+
+            bar += `<line x1="${sr[0][0] *4}" y1="${bary}" x2="${(sr[0][1] + 1)*4}" y2="${bary}" style="stroke:${color};stroke-width:4" />`
+            bary += 5
+            bar += `<line x1="${sr[1][0] *4}" y1="${bary}" x2="${(sr[1][1] + 1) *4}" y2="${bary}" style="stroke:${color};stroke-width:4" />`
+            bary += 10
+            
+        }
+
+        svg_bars.innerHTML = bar
+        return sollution
+    }
+
+
+
+
+    function get_stars(input_text)
+    {
+        document.getElementById('part1_output').textContent = part1(input_text)
+        document.getElementById('part2_output').textContent = part2(input_text)
+    }
+
+    document.getElementById('pre_example').textContent = example_input
+
+    const custom_input = document.getElementById('input_custom')
+    const custom_radio = document.getElementById('radio_custom')
+    const example_radio = document.getElementById('radio_example')
+
+    custom_radio.checked = (window.localStorage["CustomInputSelected"] == "true")
+
+    function update_source()
+    {
+        if (custom_radio.checked)
+            get_stars(custom_input.value)
+        else
+            get_stars(example_input)
+
+        window.localStorage["CustomInputSelected"] = custom_radio.checked
+    }
+
+    if (window.localStorage["CustomInputData"])
+        custom_input.value = window.localStorage["CustomInputData"]
+
+    custom_input.addEventListener("keyup", function() {
+        window.localStorage["CustomInputData"] = custom_input.value
+
+        if (custom_radio.checked)
+            get_stars(custom_input.value)
+    })
+
+    update_source()
+</script>

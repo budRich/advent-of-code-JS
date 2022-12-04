@@ -23,7 +23,7 @@ url=$(printf 'adventofcode.com/20%s/day/%s' "$year" "$day")
   printf '<a href=https://%s>%s</a><br>\n' "$url" "$url" > "$new_file"
   cat "$_this_dir/_boilerplate.html" >> "$new_file"
 
-  printf '<a href=%s>%s</a>' "$new_file" "$new_file" >> index.html
+  printf '<a href=%s>%s</a><br>\n' "${new_file##*/}" "${new_file##*/}" >> index.html
 }
 
 sublaunch "$new_file"
