@@ -1,0 +1,122 @@
+<a href=https://adventofcode.com/2022/day/5>adventofcode.com/2022/day/5</a><br>
+<style> body { background: #EEE; color: #222; } </style><br>
+<input id="radio_custom" onchange="update_source()" type="radio" name="input_source">
+<label for="radio_custom">Custom: </label>
+<textarea rows="1" cols="20" id=input_custom></textarea>
+<br>
+<input id="radio_example" checked onchange="update_source()" type="radio" name="input_source">
+<label for="radio_example">Example:</label><br><pre id=pre_example></pre>
+<hr>
+Sollution part1: <code id="part1_output"></code><br>
+Sollution part2: <code id="part2_output"></code>
+<hr>
+<pre id=notes>
+Crates are moved one at a time
+which crate will end up on top of each stack
+(CMZ) <- example
+
+(MCD) <- part2 move multiple crates at once
+
+<script type="text/javascript">
+
+    example_input=`
+    [D]    
+[N] [C]    
+[Z] [M] [P]
+ 1   2   3 
+
+move 1 from 2 to 1
+move 3 from 1 to 3
+move 2 from 2 to 1
+move 1 from 1 to 2
+    `.replace(/\n[^\n]\s{,2}/g,'\n').slice(1,)
+
+    function part1(input_text)
+    {
+        let input_array = input_text.split('\n\n')
+        let stacks = input_array[0].split('\n').reverse()
+
+        let cols = []
+
+        col_ids = stacks[0]
+        for (c in col_ids) {
+            if (col_ids[c] > 0) {
+                let indx = parseInt(col_ids[c])
+                cols[indx] = []
+                for (row of stacks.slice(1,)) {
+                    if (row[c] != " ")
+                        cols[indx].push(row[c])
+                }
+            }
+        }
+
+        console.log(cols[3])
+
+        let steps = input_array[1].trim().split('\n').map(x => x.replace(/([^0-9\s]+\s)/g,'').split(' ').map(x => parseInt(x)) )
+
+        // move 1 from 2 to 1
+        for (step of steps) {
+            console.log(step)
+            let move = step[0]
+            let src = step[1]
+            let trg = step[2]
+
+            while (move--)
+                cols[trg].push(cols[src].pop())
+            console.log(cols[trg])
+            console.log("")
+        }
+
+        let sollution = cols.slice(1,).map( x => x.reverse()[0]).toString().replace(/,/g,"")
+        
+        return sollution
+    }
+
+    function part2(input_text)
+    {
+        // input_array = input_text.trim().split('\n')
+        let sollution = "pending"
+
+        return sollution
+        
+    }
+
+
+
+
+    function get_stars(input_text)
+    {
+        document.getElementById('part1_output').textContent = part1(input_text)
+        document.getElementById('part2_output').textContent = part2(input_text)
+    }
+
+    document.getElementById('pre_example').textContent = example_input
+
+    const custom_input = document.getElementById('input_custom')
+    const custom_radio = document.getElementById('radio_custom')
+    const example_radio = document.getElementById('radio_example')
+
+    custom_radio.checked = (window.localStorage["CustomInputSelected"] == "true")
+
+    function update_source()
+    {
+        if (custom_radio.checked)
+            get_stars(custom_input.value)
+        else
+            get_stars(example_input)
+
+        window.localStorage["CustomInputSelected"] = custom_radio.checked
+    }
+
+    if (window.localStorage["CustomInputData"])
+        custom_input.value = window.localStorage["CustomInputData"]
+
+    custom_input.addEventListener("keyup", function() {
+        window.localStorage["CustomInputData"] = custom_input.value
+
+        if (custom_radio.checked)
+            get_stars(custom_input.value)
+    })
+
+    update_source()
+</script>
