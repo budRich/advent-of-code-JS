@@ -38,12 +38,10 @@ such four-character marker.
 
         while (indx++) {
             let cntrl = input_array.slice(indx-(block_size-1),indx+1).sort()
-            for (i=0;i<block_size;i++) {
+            
+            for (let i = 0; cntrl[i] != cntrl[i+1]; i++)
                 if (i == block_size-1)
                     return indx+1
-                else if (cntrl[i+1] == cntrl[i])
-                    break
-            }
         }
     }
 
