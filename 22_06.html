@@ -1,0 +1,90 @@
+<a href=https://adventofcode.com/2022/day/6>adventofcode.com/2022/day/6</a><br>
+<style> body { background: #EEE; color: #222; } </style><br>
+<input id="radio_custom" onchange="update_source()" type="radio" name="input_source">
+<label for="radio_custom">Custom: </label>
+<textarea rows="1" cols="20" id=input_custom></textarea>
+<br>
+<input id="radio_example" checked onchange="update_source()" type="radio" name="input_source">
+<label for="radio_example">Example:</label><br><pre id=pre_example></pre>
+<hr>
+Sollution part1: <code id="part1_output"></code><br>
+Sollution part2: <code id="part2_output"></code>
+<hr>
+<pre id=notes>
+
+ex: mjqjpqmgbljsphdztnvjfqwrcgsmlb => jpqm = 7
+bvwbjplbgvbhsrlpgdmjqwftvncz: => 5
+nppdvjthqldpwncqszvftbrmjlhg: => 6
+nznrnfrfntjfmvfwmzdfjlvtqnbhcprsg: => 10
+zcfzfwzzqfrljwzlrfnpqdbhtmscgvjw: => 11
+
+your subroutine needs to identify the first
+position where the four most recently received
+characters were all different. Specifically, it
+needs to report the number of characters from the
+beginning of the buffer to the end of the first
+such four-character marker.
+
+<script type="text/javascript">
+
+    example_input=`
+        nznrnfrfntjfmvfwmzdfjlvtqnbhcprsg
+    `.replace(/\n[^\n]\s+/g,'\n').slice(1,)
+
+    function get_index_of_first_unique_block(block_size, text) {
+
+        let sollution = 0
+        let input_array = text.trim().split('')
+        let indx = block_size - 1
+
+        while (sollution == 0) {
+            let cntrl = input_array.slice(indx-(block_size-1),indx+1).sort()
+            for (i=0;i<block_size;i++) {
+                if (i == block_size-1)
+                    sollution = indx+1
+                else if (cntrl[i+1] == cntrl[i])
+                    break
+            }
+
+            indx++
+        }
+
+        return sollution
+    }
+
+    function get_stars(input_text)
+    {
+        document.getElementById('part1_output').textContent = get_index_of_first_unique_block(4, input_text)
+        document.getElementById('part2_output').textContent = get_index_of_first_unique_block(14, input_text)
+    }
+
+    document.getElementById('pre_example').textContent = example_input
+
+    const custom_input = document.getElementById('input_custom')
+    const custom_radio = document.getElementById('radio_custom')
+    const example_radio = document.getElementById('radio_example')
+
+    custom_radio.checked = (window.localStorage["CustomInputSelected"] == "true")
+
+    function update_source()
+    {
+        if (custom_radio.checked)
+            get_stars(custom_input.value)
+        else
+            get_stars(example_input)
+
+        window.localStorage["CustomInputSelected"] = custom_radio.checked
+    }
+
+    if (window.localStorage["CustomInputData"])
+        custom_input.value = window.localStorage["CustomInputData"]
+
+    custom_input.addEventListener("keyup", function() {
+        window.localStorage["CustomInputData"] = custom_input.value
+
+        if (custom_radio.checked)
+            get_stars(custom_input.value)
+    })
+
+    update_source()
+</script>
