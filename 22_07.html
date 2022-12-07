@@ -1,0 +1,168 @@
+<a href=https://adventofcode.com/2022/day/7>adventofcode.com/2022/day/7</a><br>
+<style> body { background: #EEE; color: #222; } </style><br>
+<input id="radio_custom" onchange="update_source()" type="radio" name="input_source">
+<label for="radio_custom">Custom: </label>
+<textarea rows="1" cols="20" id=input_custom></textarea>
+<br>
+<input id="radio_example" checked onchange="update_source()" type="radio" name="input_source">
+<label for="radio_example">Example:</label><br><pre id=pre_example></pre>
+<hr>
+Sollution part1: <code id="part1_output"></code><br>
+Sollution part2: <code id="part2_output"></code>
+<hr>
+<pre id=notes>
+    - / (dir)
+      - a (dir)
+        - e (dir)
+          - i (file, size=584)
+        - f (file, size=29116)
+        - g (file, size=2557)
+        - h.lst (file, size=62596)
+      - b.txt (file, size=14848514)
+      - c.dat (file, size=8504156)
+      - d (dir)
+        - j (file, size=4060174)
+        - d.log (file, size=8033020)
+        - d.ext (file, size=5626152)
+        - k (file, size=7214296)
+
+at most 100000, then calculate the sum of
+their total sizes. In the example above,
+these directories are a and e; the sum of
+their total sizes is 95437 (94853 + 584)
+
+<script type="text/javascript">
+
+    example_input=`
+        $ cd /
+        $ ls
+        dir a
+        14848514 b.txt
+        8504156 c.dat
+        dir d
+        $ cd a
+        $ ls
+        dir e
+        29116 f
+        2557 g
+        62596 h.lst
+        $ cd e
+        $ ls
+        584 i
+        $ cd ..
+        $ cd ..
+        $ cd d
+        $ ls
+        4060174 j
+        8033020 d.log
+        5626152 d.ext
+        7214296 k
+    `.replace(/\n[^\n]\s+/g,'\n').slice(1,)
+
+    class Dir {
+        constructor(parent = null) {
+            this.parent = parent
+            this.size = 0
+        }
+    }
+
+    function part1(input_text)
+    {
+        let input_array = input_text.trim().split('\n')
+        let current_dir = new Dir(null)
+        let current_dir_name = ""
+        let all_dirs = {}
+
+        for (let line of input_array) {
+            if (ma = line.match(/^[$]\scd\s(.+)/)) {
+
+                console.log(`change dir to ${ma[1]}`)
+
+                console.log(`storein ${current_dir_name}`)
+                all_dirs[current_dir_name] = current_dir
+
+                if (current_dir && current_dir.parent) {
+                    current_dir.parent.size += current_dir.size
+                }
+
+                if (ma[1] == "..") {
+                    current_dir = current_dir.parent
+                    console.log(`hola`)
+                    continue
+                }
+                
+                current_dir_name = ma[1]
+
+                if (current_dir_name in all_dirs) {
+                    current_dir = all_dirs[current_dir_name]
+                } else
+                    current_dir = new Dir(current_dir)
+
+            }
+
+            else if (file_size = line.match(/^([0-9]+)/)) {
+
+                console.log(`${file_size[1]} --- ${current_dir}`)
+
+                current_dir.size += parseInt(file_size[1])
+            }
+        }
+
+        let sollution = 0
+
+        for (const key in all_dirs) {
+            if (all_dirs[key].size < 100000)
+                sollution += all_dirs[key].size
+        }
+        
+        return sollution
+    }
+
+    function part2(input_text)
+    {
+        // input_array = input_text.trim().split('\n')
+        let sollution = "pending"
+
+        return sollution
+        
+    }
+
+
+
+
+    function get_stars(input_text)
+    {
+        document.getElementById('part1_output').textContent = part1(input_text)
+        document.getElementById('part2_output').textContent = part2(input_text)
+    }
+
+    document.getElementById('pre_example').textContent = example_input
+
+    const custom_input = document.getElementById('input_custom')
+    const custom_radio = document.getElementById('radio_custom')
+    const example_radio = document.getElementById('radio_example')
+
+    custom_radio.checked = (window.localStorage["CustomInputSelected"] == "true")
+
+    function update_source()
+    {
+        if (custom_radio.checked)
+            get_stars(custom_input.value)
+        else
+            get_stars(example_input)
+
+        window.localStorage["CustomInputSelected"] = custom_radio.checked
+    }
+
+    if (window.localStorage["CustomInputData"])
+        custom_input.value = window.localStorage["CustomInputData"]
+
+    custom_input.addEventListener("keyup", function() {
+        window.localStorage["CustomInputData"] = custom_input.value
+
+        if (custom_radio.checked)
+            get_stars(custom_input.value)
+    })
+
+    update_source()
+</script>
